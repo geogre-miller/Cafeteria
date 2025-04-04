@@ -12,7 +12,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuGroup,
 } from "../components/ui/dropdown-menu";
-import { Button } from "../components/ui/button";
 
 const Navbar = () => {
   return (
