@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { processOAuthRedirect } from "../../lib/authService";
+import { processOAuthRedirect, isAdmin } from "../../lib/authService";
 
 const OAuthSuccess: React.FC = () => {
   const navigate = useNavigate();
@@ -9,8 +9,13 @@ const OAuthSuccess: React.FC = () => {
     // Process the OAuth redirect with token
     try {
       processOAuthRedirect();
-      // Navigate to home or dashboard
-      navigate("/");
+
+      // Check if user is admin and redirect accordingly
+      if (isAdmin()) {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
     } catch (error) {
       console.error("Error processing OAuth redirect:", error);
       // Navigate to login on error

@@ -17,13 +17,16 @@ app.use(passport.initialize());
 require("./config/passport")(passport);
 
 // Define MongoDB URI directly if environment variable isn't loading
-const MONGO_URI =
+let MONGO_URI =
   process.env.MONGO_URI ||
   "mongodb+srv://quanghuy00433:CkU3od4LgelNnkL6@cafeteria.5hmqgxy.mongodb.net/?retryWrites=true&w=majority&appName=Cafeteria";
 
+// Clean up the URI by removing potential spaces or line breaks
+MONGO_URI = MONGO_URI.replace(/\s+/g, "").trim();
+
 // ✅ Kết nối MongoDB
 mongoose
-  .connect(MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .connect(MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected"))
   .catch((err) => console.error("❌ MongoDB Connection Error:", err));
 

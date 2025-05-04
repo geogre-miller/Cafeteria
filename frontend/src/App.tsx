@@ -4,7 +4,9 @@ import React from "react";
 import Home from "./pages/Home";
 import Login from "./pages/auth/Login";
 import OAuthSuccess from "./pages/auth/OAuthSuccess";
-import PrivateRoute from "./components/PrivateRoute";
+import PrivateRoute from "../src/routes/PrivateRoute";
+import AdminRoute from "../src//routes/AdminRoute";
+import Admin from "./pages/admin/Admin";
 
 function App() {
   return (
@@ -18,6 +20,11 @@ function App() {
         {/* Private Routes */}
         <Route element={<PrivateRoute />}>
           <Route path="/dashboard" element={<Home />} />
+
+          {/* Admin Only Routes */}
+          <Route element={<AdminRoute />}>
+            <Route path="/admin" element={<Admin />} />
+          </Route>
         </Route>
       </Routes>
     </Router>

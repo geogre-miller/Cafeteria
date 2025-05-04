@@ -145,7 +145,7 @@ export const authFetch = async (
   url: string,
   options: RequestInit = {}
 ): Promise<Response> => {
-  let headers = new Headers(options.headers);
+  const headers = new Headers(options.headers);
 
   // Add token to headers
   const token = getAccessToken();
@@ -179,7 +179,7 @@ export const authFetch = async (
     } catch (error) {
       // If refresh fails, the user will need to login again
       logoutUser();
-      throw new Error("Session expired. Please login again.");
+      throw new error("Session expired. Please login again.");
     }
   }
 

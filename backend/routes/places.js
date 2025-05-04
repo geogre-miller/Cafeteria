@@ -3,67 +3,147 @@ const Place = require("../models/Place");
 const { p } = require("framer-motion/client");
 
 const router = express.Router();
-
-// ✅ API GET: Lấy danh sách tất cả địa điểm
+// @route   GET api/places
+// @desc    Get all places
+// @access  Public
 router.get("/", async (req, res) => {
   try {
     const places = await Place.find();
-    res.json(places);
+    res.json({
+      success: true,
+      places,
+    });
   } catch (error) {
-    res.status(500).json({ error: "Lỗi khi lấy danh sách địa điểm" });
+    console.error(error.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error when fetching places",
+    });
   }
 });
 
-// ✅ API POST: Thêm địa điểm mới
-router.post("/", (req, res) => {
-  const newPlace = new Place(req.body);
+// @route   POST api/places
+// @desc    Create a new place
+// @access  Public
+router.post("/", async (req, res) => {
+  try {
+    const { name, address, category, imageUrl } = req.body;
 
-  newPlace
-    .save()
-    .then((savedPlace) => {
-      res.status(201).json(savedPlace);
-    })
-    .catch((error) => {
-      res.status(400).json({ error: "Lỗi khi thêm địa điểm" });
+    // Create new place instance
+    const newPlace = new Place({
+      name,
+      address,
+      category,
+      imageUrl,
     });
+
+    // Save to database
+    const savedPlace = await newPlace.save();
+
+    res.status(201).json({
+      success: true,
+      place: savedPlace,
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.status(400).json({
+      success: false,
+      message: "Error creating new place",
+    });
+  }
 });
 
-// router.post("/", async (req, res) =>{
-//   try {
-//     const { name, address, category, imageUrl } = req.body;
-//     const newPlace = new Place({
-//       name,
-//       address,
-//       category,
-//       imageUrl,
-//     });
-//     await newPlace.save();
-//     res.status(201).json(newPlace);
-//   } catch (error) {
-//     res.status(400).json({ error: "Lỗi khi thêm địa điểm" });
-//   }
-// })
+// @route   GET api/places/:id
+// @desc    Get place by ID
+// @access  Public
+router.get("/:id", async (req, res) => {
+  try {
+    const place = await Place.findById(req.params.id);
 
-router.post("/", (req, res) => {
-  const newPlace = new Place(req.body);
+    if (!place) {
+      return res.status(404).json({
+        success: false,
+        message: "Place not found",
+      });
+    }
 
-  newPlace
-    .save()
-    .then((savedPlace) => {
-      res.status(201).json(savedPlace);
-    })
-    .catch((error) => {
-      res.status(400).json({ error: "Lỗi khi thêm địa điểm" });
+    res.json({
+      success: true,
+      place,
     });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error when fetching place",
+    });
+  }
 });
 
-// ✅ API DELETE: Xóa địa điểm theo ID
+// @route   PUT api/places/:id
+// @desc    Update place by ID
+// @access  Public
+router.put("/:id", async (req, res) => {
+  try {
+    const { name, address, category, imageUrl } = req.body;
+    const updateFields = {};
+
+    // Only add fields that are provided
+    if (name) updateFields.name = name;
+    if (address) updateFields.address = address;
+    if (category) updateFields.category = category;
+    if (imageUrl) updateFields.imageUrl = imageUrl;
+
+    const place = await Place.findByIdAndUpdate(
+      req.params.id,
+      { $set: updateFields },
+      { new: true }
+    );
+
+    if (!place) {
+      return res.status(404).json({
+        success: false,
+        message: "Place not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      place,
+    });
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error when updating place",
+    });
+  }
+});
+
+// @route   DELETE api/places/:id
+// @desc    Delete place by ID
+// @access  Public
 router.delete("/:id", async (req, res) => {
   try {
-    await Place.findByIdAndDelete(req.params.id);
-    res.json({ message: "Địa điểm đã được xóa" });
+    const place = await Place.findByIdAndDelete(req.params.id);
+
+    if (!place) {
+      return res.status(404).json({
+        success: false,
+        message: "Place not found",
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "Place successfully deleted",
+    });
   } catch (error) {
-    res.status(500).json({ error: "Lỗi khi xóa địa điểm" });
+    console.error(error.message);
+    res.status(500).json({
+      success: false,
+      message: "Server error when deleting place",
+    });
   }
 });
 

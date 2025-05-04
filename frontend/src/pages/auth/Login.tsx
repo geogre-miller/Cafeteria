@@ -27,8 +27,15 @@ const Login: React.FC = () => {
     setLoading(true);
 
     try {
-      await loginUser(formData);
-      navigate("/");
+      const response = await loginUser(formData);
+      const user = response.user;
+
+      // Redirect based on user role
+      if (user.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Login failed. Please try again."
